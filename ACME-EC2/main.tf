@@ -15,13 +15,13 @@ resource "aws_instance" "ec2_instance" {
   source_dest_check      = "${var.sdcheck}"
   #user_data              = "${var.user_data}"
   root_block_device  {
-    volume_type           = "${lookup(var.root_block_device, "volume_type")}"
-    volume_size           = "${lookup(var.root_block_device, "volume_size")}"
-    delete_on_termination = "${lookup(var.root_block_device, "delete_on_termination")}"
+    volume_type           =   "${var.volume_type}" 
+    volume_size           =  "${var.volume_size}" 
+    delete_on_termination = "${var.delete_on_termination}"
   }
 
   tags = {
-    Name               = "${var.regionname}-${var.env_short}-${var.servicename}-01"
+    Name               = "${var.regionname}-${var.env_short}-${appname}-${var.servicename}-01"
     Environment        = "${var.environment}"
     Owner              = "${var.Owner}"
 }
@@ -33,12 +33,12 @@ resource "aws_instance" "ec2_instance" {
 
 
 resource "aws_security_group" "sg" {
-  name        = "${var.securitygroupname}"
+  name        = "${var.regionname}-${var.env_short}-${appname}-${var.servicename}-01"
   description = "Allow TLS inbound traffic"
   vpc_id      = "${var.vpc_id}"
 
   tags = {
-    Name               = "${var.regionname}-${var.env_short}-SPLUNK-${var.servicename}-01"
+    Name               = "${var.regionname}-${var.env_short}-${appname}-${var.servicename}-01"
     Environment        = "${var.environment}"
     Owner              = "${var.Owner}"
   }
@@ -116,24 +116,23 @@ variable "subnet_id" {
       default = "true"
   }
   
-  variable "root_block_device" {
-  default = {
-    volume_type           = "gp2"
-    volume_size           = "30"
-    delete_on_termination = true
+  variable "volume_type" {
+      default = "true"
   }
-}
+  variable "volume_size" {
+      default = "true"
+  }
+  variable "delete_on_termination" {
+      default = "true"
+  }
 
 variable "ebs_optimized" {
     default = "true"
 }
 
-variable "securitygroupname" {
-  default = "ACM-DEMO-SG-04"
-}
 
 variable "vpc_id" {
-  default = "vpc-0eb8858d508dc6539"
+  default = ""
 }
 # variable "user_data" {
 #     default = ""
@@ -155,3 +154,15 @@ variable "vpc_id" {
 # output "inst_publicdns" {
 #   value = "${aws_instance.ec2_instance.public_dns}"
 # }
+  
+
+output "inst_privateip" {
+  value = "${aws_instance.ec2_instance.public_ip}"
+}
+
+output "inst_privatedns" {
+  value = "${aws_instance.ec2_instance.public_dns}"
+}
+  
+  
+  
